@@ -13,4 +13,6 @@ bool CARGS_GET_VALUE_BY_KEY(const char *key, const char **value);
 
 void CARGS_SET_MODE_CALLBACK_FUNC(int argc, CARGS_MODE_CALLBACK_FUNC func);
 
+void CARGS_SET_NO_MATCH_CALLBACK_FUNC(CARGS_MODE_CALLBACK_FUNC func);
+
 #endif//CARGS_CARGS_H

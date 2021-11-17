@@ -12,7 +12,12 @@ void check(const char *key) {
     }
 }
 
+void no_match(char **argv) {
+    puts("no match\n");
+}
+
 int main(int argc, char **argv) {
+    CARGS_SET_NO_MATCH_CALLBACK_FUNC(no_match);
     CARGS_INIT(argc, argv);
     CARGS_REQUEST("d");
     CARGS_REQUEST("f");

@@ -7,7 +7,7 @@
 #define CARGS_MARK '-'
 
 struct str_cmp {
-    bool operator()(char const *a, char const *b) {
+    bool operator()(const char *a, const char *b) const {
         return std::strcmp(a, b) < 0;
     }
 };
@@ -26,6 +26,7 @@ bool has_mark(int argc, char **argv) {
 
 static std::map<const char *, const char *, str_cmp> kv_map;
 static std::map<int, CARGS_MODE_CALLBACK_FUNC> cb_func_map;
+static CARGS_MODE_CALLBACK_FUNC no_match_func = nullptr;
 
 void CARGS_INIT(int argc, char **argv) {
     if (has_mark(argc, argv)) {
@@ -36,22 +37,29 @@ void CARGS_INIT(int argc, char **argv) {
                     i++;
                 } else {
                     printf("参数错误，在 \"%s\" 附近\n", argv[i]);
-                    exit(-1);
+                    goto no_match_case;
                 }
             }
         } else {
-            puts("参数个数错误\n");
-            exit(-1);
+            puts("参数个数错误");
+            goto no_match_case;
         }
+        return;
     } else {
         auto itor = cb_func_map.find(argc - 1);
         if (itor == cb_func_map.end()) {
-            puts("没有找到匹配的模式\n");
-            exit(-1);
+            puts("没有找到匹配的模式");
+            goto no_match_case;
         } else {
             itor->second(argv);
         }
     }
+
+no_match_case:
+    if(no_match_func){
+        no_match_func(argv);
+    }
+    exit(-1);
 }
 
 void CARGS_REQUEST(const char *key) {
@@ -79,4 +87,8 @@ bool CARGS_GET_VALUE_BY_KEY(const char *key, const char **value) {
 
 void CARGS_SET_MODE_CALLBACK_FUNC(int argc, CARGS_MODE_CALLBACK_FUNC func) {
     cb_func_map[argc] = func;
+}
+
+void CARGS_SET_NO_MATCH_CALLBACK_FUNC(CARGS_MODE_CALLBACK_FUNC func) {
+    no_match_func = func;
 }
